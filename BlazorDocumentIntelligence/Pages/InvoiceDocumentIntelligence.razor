@@ -1,0 +1,140 @@
+﻿@page "/document-intelligence-invoice"
+@using BlazorDocumentIntelligence.Services
+@using BlazorDocumentIntelligence.Models
+@inject IAzureDocumentIntelligenceService DocumentIntelligenceService
+
+<div class="container-fluid">
+    <h3 class="mb-4">Extract Invoices Data (OCR) Using Blazor and Azure Document Intelligence with prebuilt-invoice model.</h3>
+
+    <div class="mb-4">
+        <button class="btn btn-primary" @onclick="AnalyzeDocumentAsync">
+            @if (_isAnalyzing)
+            {
+                <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                <span>Analyzing...</span>
+            }
+            else
+            {
+                <span>Analyze Document</span>
+            }
+        </button>
+    </div>
+
+    @if (_invoiceAnalysis != null)
+    {
+        <div class="card">
+            <div class="card-body">
+                <!-- Header Section -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">Vendor</h5>
+                        <h4>@_invoiceAnalysis.VendorName</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">Customer</h5>
+                        <h4>@_invoiceAnalysis.CustomerName</h4>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-end">Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in _invoiceAnalysis.Items)
+                            {
+                                <tr>
+                                    <td>@item.Description</td>
+                                    <td class="text-center">
+                                        @if (item.Quantity.HasValue)
+                                        {
+                                            @item.Quantity.Value.ToString("N2")
+                                            @if (item.QuantityConfidence.HasValue)
+                                            {
+                                                <small class="text-muted">(@(item.QuantityConfidence.Value.ToString("P1")))</small>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (item.Amount != null)
+                                        {
+                                            @($"{item.Amount.CurrencySymbol}{item.Amount.Amount:N2}")
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (item.Confidence.HasValue)
+                                        {
+                                            @item.Confidence.Value.ToString("P1")
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="row justify-content-end">
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td class="text-end">Subtotal:</td>
+                                    <td class="text-end">
+                                        @if (_invoiceAnalysis.SubTotal != null)
+                                        {
+                                            @($"{_invoiceAnalysis.SubTotal.CurrencySymbol}{_invoiceAnalysis.SubTotal.Amount:N2}")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">Tax:</td>
+                                    <td class="text-end">
+                                        @if (_invoiceAnalysis.TotalTax != null)
+                                        {
+                                            @($"{_invoiceAnalysis.TotalTax.CurrencySymbol}{_invoiceAnalysis.TotalTax.Amount:N2}")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td class="text-end">Total:</td>
+                                    <td class="text-end">
+                                        @if (_invoiceAnalysis.InvoiceTotal != null)
+                                        {
+                                            @($"{_invoiceAnalysis.InvoiceTotal.CurrencySymbol}{_invoiceAnalysis.InvoiceTotal.Amount:N2}")
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private InvoiceAnalysis? _invoiceAnalysis;
+    private bool _isAnalyzing;
+
+    private async Task AnalyzeDocumentAsync()
+    {
+        try
+        {
+            _isAnalyzing = true;
+            _invoiceAnalysis = await DocumentIntelligenceService.AnalyzeAsync();
+        }
+        finally
+        {
+            _isAnalyzing = false;
+        }
+    }
+}
