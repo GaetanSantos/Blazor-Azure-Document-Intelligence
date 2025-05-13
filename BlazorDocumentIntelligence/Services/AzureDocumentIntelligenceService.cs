@@ -20,7 +20,7 @@ namespace BlazorDocumentIntelligence.Services
 
         public async Task<InvoiceAnalysis> AnalyzeAsync()
         {
-            Uri invoiceUri = new Uri("{YOUR-FILE-URL}");
+            Uri invoiceUri = new("{YOUR-FILE-URL}");
             Operation<AnalyzeResult> operation = await _documentIntelligenceClient.AnalyzeDocumentAsync(
                 WaitUntil.Completed, "prebuilt-invoice", invoiceUri);
 
