@@ -4,6 +4,6 @@ namespace BlazorDocumentIntelligence.Services
 {
     public interface IAzureDocumentIntelligenceService
     {
-        Task<InvoiceAnalysis> AnalyzeAsync();
+        Task<InvoiceAnalysis> AnalyzeAsync(string fileUrl);
     }
 }

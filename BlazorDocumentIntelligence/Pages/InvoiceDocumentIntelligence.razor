@@ -1,13 +1,15 @@
 ﻿@page "/document-intelligence-invoice"
 @using BlazorDocumentIntelligence.Services
 @using BlazorDocumentIntelligence.Models
+@using BlazorDocumentIntelligence.Shared
 @inject IAzureDocumentIntelligenceService DocumentIntelligenceService
+@inject IAzureBlobStorageService BlobStorageService
 
 <div class="container-fluid">
     <h3 class="mb-4">Extract Invoices Data (OCR) Using Blazor and Azure Document Intelligence with prebuilt-invoice model.</h3>
-
-    <div class="mb-4">
-        <button class="btn btn-primary" @onclick="AnalyzeDocumentAsync">
+    <div class="mb-4 d-flex align-items-center">
+        <InputFile OnChange="HandleFileSelected" />
+        <button class="btn btn-primary ms-2" @onclick="AnalyzeDocumentAsync" disabled="@(!_canAnalyze)">
             @if (_isAnalyzing)
             {
                 <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
@@ -119,22 +121,82 @@
             </div>
         </div>
     }
+
+    <Snackbar Message="@_snackbarMessage" CssClass="@_snackbarCssClass" Visible="@_snackbarVisible" OnClose="HideSnackbar" />
 </div>
 
 @code {
     private InvoiceAnalysis? _invoiceAnalysis;
     private bool _isAnalyzing;
+    private bool _canAnalyze = false;
+    private string? _uploadedFileUrl;
+    private string? _snackbarMessage;
+    private string _snackbarCssClass = "bg-success";
+    private bool _snackbarVisible;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        _canAnalyze = false;
+        var file = e.File;
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream();
+            var fileName = $"{Guid.NewGuid()}_{file.Name}";
+            try
+            {
+                _uploadedFileUrl = await BlobStorageService.UploadAsync(stream, fileName);
+                _canAnalyze = true;
+                ShowSnackbar("File uploaded to Azure Blob Storage successfully.");
+            }
+            catch
+            {
+                _canAnalyze = false;
+                ShowSnackbar("Error uploading file to Azure Blob Storage.", isError: true);
+            }
+        }
+    }
 
     private async Task AnalyzeDocumentAsync()
     {
+        if (string.IsNullOrEmpty(_uploadedFileUrl))
+            return;
+
         try
         {
             _isAnalyzing = true;
-            _invoiceAnalysis = await DocumentIntelligenceService.AnalyzeAsync();
+            _invoiceAnalysis = await DocumentIntelligenceService.AnalyzeAsync(_uploadedFileUrl);
+            ShowSnackbar("Document analysis succeeded.");
+        }
+        catch
+        {
+            ShowSnackbar("Error during document analysis.", isError: true);
         }
         finally
         {
             _isAnalyzing = false;
         }
+    }
+
+    private void ShowSnackbar(string message, bool isError = false)
+    {
+        _snackbarMessage = message;
+        _snackbarCssClass = isError ? "bg-danger" : "bg-success";
+        _snackbarVisible = true;
+        StateHasChanged();
+        _ = HideSnackbarAfterDelay();
+    }
+
+    private async Task HideSnackbarAfterDelay()
+    {
+        await Task.Delay(5000);
+        _snackbarVisible = false;
+        StateHasChanged();
+    }
+
+    private Task HideSnackbar()
+    {
+        _snackbarVisible = false;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 }

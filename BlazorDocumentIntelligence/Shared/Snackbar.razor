@@ -1,0 +1,22 @@
+﻿@code {
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public string CssClass { get; set; } = "bg-success";
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task HideAsync()
+    {
+        if (OnClose.HasDelegate)
+            await OnClose.InvokeAsync();
+    }
+}
+
+@if (Visible)
+{
+    <div class="snackbar @CssClass" style="position:fixed;bottom:30px;right:30px;z-index:9999;min-width:250px;">
+        <div class="d-flex justify-content-between align-items-center p-3 text-white">
+            <span>@Message</span>
+            <button class="btn-close btn-close-white ms-3" @onclick="HideAsync" aria-label="Close"></button>
+        </div>
+    </div>
+}

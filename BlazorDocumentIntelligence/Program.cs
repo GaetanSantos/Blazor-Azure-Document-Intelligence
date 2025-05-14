@@ -8,5 +8,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<IAzureDocumentIntelligenceService, AzureDocumentIntelligenceService>();
+builder.Services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
 
 await builder.Build().RunAsync();
