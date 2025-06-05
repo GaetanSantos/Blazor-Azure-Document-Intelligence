@@ -47,3 +47,4 @@ The app will be available at: http://localhost:5227
 - [Azure Document Intelligence Documentation](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/?view=doc-intel-4.0.0)
 - [Azure  Document Intelligence Invoice Model](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/prebuilt/invoice?view=doc-intel-4.0.0)
 - [C# SDK Azure Document Intelligence](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/quickstarts/get-started-sdks-rest-api?view=doc-intel-4.0.0&preserve-view=true&pivots=programming-language-csharp)
+- Invoice file used in demo is located inside `invoice-sample` folder. I used the [Microsoft's templates gallery](https://create.microsoft.com/en-us/templates/invoices) to generate it.
