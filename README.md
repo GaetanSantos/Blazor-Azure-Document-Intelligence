@@ -7,6 +7,9 @@ This project is an Optical Character Recognition (OCR) application built with Bl
 - :chart_with_upwards_trend: Analyzing invoices with Azure Document Intelligence
 - :page_facing_up: Displaying extracted vendor, customer, line items, totals and associated confidence score in a user-friendly UI with Bootstrap
 
+## Demo
+![Blazor Document Intelligence](assets/BlazorAzureDocumentIntelligence.gif)
+
 ## Prerequisites
 To run this project, you will need:
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
