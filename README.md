@@ -5,7 +5,7 @@ This project is an Optical Character Recognition (OCR) application built with Bl
 ## Key Features
 - :floppy_disk: Uploading and saving PDF invoices to Azure Blob Storage
 - :chart_with_upwards_trend: Analyzing invoices with Azure Document Intelligence prebuilt-invoice models
-- :page_facing_up: Displaying extracted vendor, customer, line items, totals and associated confidence score in a user-friendly UI with Bootstrap
+- :page_facing_up: Displaying the data retrieved from OCR analysis (vendor, customer, line items, totals and associated confidence score) in a user-friendly UI with Bootstrap
 
 ## Demo
 ![Blazor Document Intelligence](assets/BlazorAzureDocumentIntelligence.gif)
